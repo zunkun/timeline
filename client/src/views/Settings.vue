@@ -1,22 +1,25 @@
 <template>
   <div id="settings">
     <el-tabs v-model="activeName" @tab-click="handleClick">
-      <el-tab-pane label="目录管理" name="first">
+      <el-tab-pane label="目录管理" name="disk">
         <DirectoryList />
       </el-tab-pane>
-      <el-tab-pane label="用户管理" name="second">用户管理</el-tab-pane>
-      <el-tab-pane label="主题管理" name="third">主题管理</el-tab-pane>
-      <el-tab-pane label="任务设置" name="fourth">任务设置</el-tab-pane>
+      <el-tab-pane label="用户管理" name="userlist">
+        <UserList />
+      </el-tab-pane>
+      <el-tab-pane label="主题管理" name="theme">主题管理</el-tab-pane>
+      <el-tab-pane label="任务设置" name="tasks">任务设置</el-tab-pane>
     </el-tabs>
   </div>
 </template>
 <script>
   import DirectoryList from '../components/DirectoryList.vue';
+  import UserList from '../components/UserList.vue';
   export default {
-    components: {DirectoryList},
+    components: {DirectoryList, UserList},
     data() {
       return {
-        activeName: 'first'
+        activeName: 'userlist'
       };
     },
     methods: {
@@ -26,3 +29,9 @@
     }
   };
 </script>
+
+<style>
+  #settings {
+    padding: 20px;
+  }
+</style>

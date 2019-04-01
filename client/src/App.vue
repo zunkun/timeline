@@ -15,14 +15,24 @@
                 <span slot="title">家人</span>
               </template>
               <el-menu-item-group>
-                <el-menu-item class="el-icon-tl-girl" index="2-1" :route="{'name': 'personal', 'params': {'name': '丹丹'}}">丹丹</el-menu-item>
-                <el-menu-item class="el-icon-tl-girl" index="2-2" :route="{'name': 'personal', 'params': {'name': '彤彤'}}">彤彤</el-menu-item>
-                <el-menu-item class="el-icon-tl-family" index="2-3" :route="{'name': 'personal', 'params': {'name': '合影'}}">合影</el-menu-item>
+                <el-menu-item
+                  v-for="relation in $store.state.relations" 
+                  :key="relation.id"
+                  :class="[
+                  [(relation.relation === '女儿' || relation.relation === '妻子'|| relation.gender === 'F') ?'el-icon-tl-girl': ''],
+                  [(relation.relation === '儿子' || relation.gender === 'M') ?'el-icon-tl-boy': ''],
+                  [(relation.relation === '父母' ||relation.relation === '朋友' || relation.gender === 'MF') ?'el-icon-tl-family': '']
+                  ]" 
+                  :index="2 + '-' + relation.id" 
+                  :route="{'name': 'personal', 'params': {'name': relation.name}}"
+                >
+                  {{relation.name}}
+                </el-menu-item>
               </el-menu-item-group>
             </el-submenu>
             <el-menu-item index="3" :route="{'name': 'timeline'}">
               <i class="el-icon-date"></i>
-              <span slot="title">時光</span>
+              <span slot="title">场景</span>
             </el-menu-item>
             <el-menu-item index="4" :route="{'name': 'settings'}">
               <i class="el-icon-setting"></i>
@@ -44,8 +54,26 @@
 export default {
   data() {
     return {
-      isCollapse: false
+      isCollapse: false,
+      relations: [],
+        isActive: true,
+  error: null
     }
+  },
+  methods: {
+    getRelations() {
+      fetch('/tl/api/relations/')
+        .then(res => res.json())
+        .then(relations => {
+          this.relations = relations ||[];
+          this.$store.commit('setRelations', relations)
+        });
+    }
+  },
+  created() {
+    this.getRelations();
+  },
+  computed: {
   }
 }
 </script>

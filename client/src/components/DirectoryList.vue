@@ -22,7 +22,7 @@
             </el-table-column>
             <el-table-column label="操作" width="80">
               <template slot-scope="scope">
-                <el-button size="mini" type="danger" @click="delDir(scope.row)">删除</el-button>
+                <el-button size="mini" plain type="danger" @click="delDir(scope.row)">删除</el-button>
               </template>
             </el-table-column>
           </el-table>
@@ -45,17 +45,6 @@
       }
     },
     methods: {
-      fileChange(data) {
-        let file = this.$refs.file.files[0];
-        console.log({
-          file
-        })
-        let url = window.webkitURL.createObjectURL(file);
-        console.log({
-          url
-        })
-
-      },
       editDir(data) {
         console.log({
           data

@@ -5,12 +5,16 @@ Vue.use(Vuex)
 
 export default new Vuex.Store({
   state: {
-
+    relations: [],
   },
   mutations: {
-
+    setRelations(state, relations) {
+      state.relations = relations;
+    }
   },
   actions: {
-
+    setRelations(context, relations) {
+      context.commit('setRelations', relations)
+    }
   }
 })

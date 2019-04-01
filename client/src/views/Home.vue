@@ -1,6 +1,7 @@
 <template>
   <div id="home">
-    <el-row :gutter="10" v-for="(imageList, listIndex) of imageLists" :key="imageList.id">
+    <div id="imagelist">
+      <el-row :gutter="10" v-for="(imageList, listIndex) of imageLists" :key="imageList.id">
       <el-col :span="2">
         <div class="date-str">
           <div class="date-day">{{imageList.day}}</div>
@@ -17,6 +18,7 @@
         </el-row>
       </el-col>
     </el-row>
+    </div>
     <template v-if="showImage">
     </template>
     <el-dialog :title="currentImage.name" :visible.sync="showImageView" :fullscreen="true" modal close-on-click-modal
@@ -131,6 +133,22 @@
 <style>
   #home {
     height: inherit;
+  }
+
+  #main {
+    padding: 0;
+  }
+
+  .el-header {
+    position: fixed;
+    width:100%;
+    border-bottom: solid 1px #ccc;
+    opacity: 1;
+    background: #fff;
+  }
+
+  #imagelist {
+    padding-top:60px;
   }
 
   .date-day {
