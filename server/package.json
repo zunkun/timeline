@@ -37,20 +37,15 @@
     "nodemon": "^1.18.9"
   },
   "dependencies": {
+    "ejs": "^2.6.1",
+    "exif": "^0.6.0",
+    "is-image": "^2.0.0",
     "koa": "^2.6.2",
     "koa-bodyparser": "^4.2.1",
     "koa-json": "^2.0.2",
-    "koa-passport": "^4.1.1",
     "koa-router": "^7.4.0",
-    "koa-session": "^5.10.1",
-    "koa-sslify": "^4.0.3",
     "koa-static": "^5.0.0",
-    "koa-views": "^6.1.5",
-    "lodash": "^4.17.11",
-    "log4js": "^3.0.6",
     "node-windows": "^0.1.14",
-    "passport": "^0.4.0",
-    "passport-local": "^1.0.0",
     "sequelize": "^4.42.0",
     "sqlite3": "^4.0.6"
   }

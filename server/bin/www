@@ -2,8 +2,6 @@
 
 const app = require('../app');
 const http = require('http');
-const log = require('../utils/logs');
-const User = require('../models/user')
 
 const env = process.env.NODE_ENV === 'production' ? require('../config/production.json') : require('../config/development.json');
 
@@ -31,10 +29,10 @@ function onError (error) {
 
 	switch (error.code) {
 	case 'EACCES':
-		log.error(bind + ' requires elevated privileges');
+		console.error(bind + ' requires elevated privileges');
 		process.exit(1);
 	case 'EADDRINUSE':
-		log.error(bind + ' is already in use');
+		console.error(bind + ' is already in use');
 		process.exit(1);
 	default:
 		throw error;
@@ -46,5 +44,5 @@ function onListening () {
 	const bind = typeof addr === 'string'
 		? 'pipe ' + addr
 		: 'port ' + addr.port;
-	log.info('Listening on ' + bind);
+	console.info('Listening on ' + bind);
 }

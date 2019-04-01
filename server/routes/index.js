@@ -1,17 +1,12 @@
 const Router = require('koa-router');
-
 const router = new Router();
-let times = 0;
+const diskService = require('../services/diskService');
+const Directory = require('../models/Directory');
+router.prefix('/');
 router.get('/', async (ctx, next) => {
-	times++;
-	ctx.cookies.set('times', times, {
-		signed: true,
-		maxAge: 60 * 60 * 1000,
-		overwrite: true,
-		httpOnly: true
-	});
-	ctx.body = { msg: 'HELLO, ZKOA', times };
-	await next();
-});
+	console.log(22222222);
+	return ctx.render('index.ejs', { title: 'hello' });
+})
+;
 
 module.exports = router;

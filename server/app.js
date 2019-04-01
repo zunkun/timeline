@@ -2,12 +2,10 @@
 
 const Koa = require('koa');
 const app = new Koa();
-const views = require('koa-views');
 const json = require('koa-json');
 const bodyparser = require('koa-bodyparser');
 const fs = require('fs');
 const path = require('path');
-const log = require('./utils/logs/index');
 
 app.keys = ['abcd1234', '11235813abcd'];
 // middlewares
@@ -16,23 +14,9 @@ app.use(bodyparser({
 }));
 app.use(json());
 
-// 请求日志
-app.use(async (ctx, next) => {
-	const start = new Date();
-	let end;
-	try {
-		await next();
-		end = new Date();
-		log.res(ctx, end - start);
-	} catch (error) {
-		end = new Date();
-		log.resError(ctx, error, end - start);
-	}
-});
-
 // 请求出错日志
 app.on('error', function (err) {
-	log.error(err);
+	console.error(err);
 });
 
 /**
@@ -41,6 +25,7 @@ app.on('error', function (err) {
 function initRouters (pathRoute) {
 	let routersPath = path.join(__dirname, 'routes');
 	let files = fs.readdirSync(routersPath);
+	console.log({ files });
 
 	files.forEach(file => {
 		let stat = fs.lstatSync(path.join(routersPath, file));
@@ -56,10 +41,7 @@ function initRouters (pathRoute) {
 	});
 }
 
-initRouters();
-
 app.use(require('koa-static')(path.join(__dirname, '/public')));
-app.use(views(path.join(__dirname, '/views'), {
-	extension: 'ejs'
-}));
+
+initRouters();
 module.exports = app;
