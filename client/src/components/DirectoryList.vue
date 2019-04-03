@@ -83,7 +83,7 @@
         .then(folders => {
           resolve(folders)
         })
-        .catch(error => {
+        .catch(() => {
           resolve([]);
         })
       },

@@ -259,9 +259,4 @@
   .el-icon-arrow-left {
     font-size: 60px;
   }
-
-  #img-h {
-    margin: 14px;
-    vertical-align: center;
-  }
 </style>

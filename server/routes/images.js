@@ -39,4 +39,11 @@ router.get('/', async (ctx, next) => {
 	await next();
 });
 
+router.post('/explore', async (ctx, next) => {
+	const { fullpath } = ctx.request.body;
+	const exec = require('child_process').exec;
+	exec(`explorer.exe /select, ${fullpath}`);
+	ctx.status = 200;
+});
+
 module.exports = router;

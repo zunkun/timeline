@@ -2,6 +2,7 @@ const path = require('path');
 const isImage = require('is-image');
 const ExifImage = require('exif').ExifImage;
 const fs = require('fs');
+const util = require('../util');
 
 const Directory = require('../models/Directory');
 const Image = require('../models/Image');
@@ -58,61 +59,65 @@ class ScanService {
 				let promiseArray = [];
 
 				for (let image of images) {
-					let promise = Image.findOne({ where: { fullpath: image.fullpath } })
-						.then(async existImage => {
-							if (existImage) {
-								return Promise.resolve(existImage);
-							}
-
-							console.log(`正在保存${image.name}`);
-							let exifData = await this.getExif(image.fullpath);
-
-							let timeStr = exifData.exif.DateTimeOriginal || exifData.exif.CreateDate;
-							let ctime;
-							if (timeStr) {
-								ctime = new Date(timeStr.split(' ')[0].replace(/\:/g, '-'));
-							} else {
-								ctime = new Date(image.ctime);
-							}
-							let year = ctime.getFullYear();
-							let month = ctime.getMonth() < 9 ? `0${ctime.getMonth() + 1}` : ctime.getMonth() + 1;
-							let day = ctime.getDate() < 10 ? `0${ctime.getDate()}` : ctime.getDate();
-							let daystr = `${year}-${month}-${day}`;
-							console.log({ ctime, year, month, day, daystr });
-
-							return this.getImageDateId(daystr, year, month, day)
-								.then(imagedateId => {
-									if (!imagedateId) {
-										console.log({ year, month, day, daystr });
-										process.exit(0);
+					let promise = util.getHash(image.fullpath)
+						.then(hash => {
+							return Image.findOne({ where: { hash, fullpath: image.fullpath } })
+								.then(async existImage => {
+									if (existImage) {
+										return Promise.resolve(existImage);
 									}
-									return Image.create({
-										fullpath: image.fullpath,
-										link: image.fullpath.replace(/\\/g, '\/').slice(2),
-										name: image.name,
-										dir: image.dir,
-										base: image.base,
-										ext: image.ext,
-										directoryId,
-										year,
-										month,
-										day,
-										daystr,
-										ctime,
-										imagedateId
-									});
-								})
-								.then((imageData) => {
-									console.log(`存储 ${image.name} exif 信息`);
-									return Exif.create({
-										imageId: imageData.id,
-										imageInfo: exifData.image,
-										thumbnail: exifData.thumbnail,
-										gps: exifData.gps,
-										exif: exifData.exif,
-										interoperability: exifData.interoperability,
-										makernote: exifData.makernote
-									});
+									console.log(`正在保存${image.name}`);
+									let exifData = await this.getExif(image.fullpath);
+
+									let timeStr = exifData.exif.DateTimeOriginal || exifData.exif.CreateDate;
+									let ctime;
+									if (timeStr) {
+										ctime = new Date(timeStr.split(' ')[0].replace(/\:/g, '-'));
+									} else {
+										ctime = new Date(image.ctime);
+									}
+									let year = ctime.getFullYear();
+									let month = ctime.getMonth() < 9 ? `0${ctime.getMonth() + 1}` : ctime.getMonth() + 1;
+									let day = ctime.getDate() < 10 ? `0${ctime.getDate()}` : ctime.getDate();
+									let daystr = `${year}-${month}-${day}`;
+
+									return this.getImageDateId(daystr, year, month, day)
+										.then(imagedateId => {
+											if (!imagedateId) {
+												return Promise.reject(Error(`获取日期信息失败 ${daystr}`));
+											}
+											return imagedateId;
+										})
+										.then((imagedateId) => {
+											return Image.create({
+												fullpath: image.fullpath,
+												hash,
+												link: image.fullpath.replace(/\\/g, '\/').slice(2),
+												name: image.name,
+												dir: image.dir,
+												base: image.base,
+												ext: image.ext,
+												directoryId,
+												year,
+												month,
+												day,
+												daystr,
+												ctime,
+												imagedateId
+											});
+										})
+										.then((imageData) => {
+											console.log(`存储 ${image.name} exif 信息`);
+											return Exif.create({
+												imageId: imageData.id,
+												imageInfo: exifData.image,
+												thumbnail: exifData.thumbnail,
+												gps: exifData.gps,
+												exif: exifData.exif,
+												interoperability: exifData.interoperability,
+												makernote: exifData.makernote
+											});
+										});
 								});
 						});
 					promiseArray.push(promise);

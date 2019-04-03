@@ -2,7 +2,7 @@
   <div id="app">
     <el-container>
       <el-container>
-        <el-aside width="200px">
+        <el-aside width="160px">
           <el-menu default-active="2-2"
             :collapse="isCollapse" active-text-color="#FF9900" :router=true>
             <el-menu-item index="1" :route="{'name': 'home'}">
@@ -25,6 +25,7 @@
                   ]" 
                   :index="2 + '-' + relation.id" 
                   :route="{'name': 'personal', 'params': {'name': relation.name}}"
+                  :style="{color: relation.color}"
                 >
                   {{relation.name}}
                 </el-menu-item>

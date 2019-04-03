@@ -27,6 +27,14 @@
           <el-form-item label="排序" prop="sequelence">
             <el-input v-model.number="relation.sequelence"></el-input>
           </el-form-item>
+          <el-form-item label="颜色" prop="color">
+            <el-input placeholder="输入颜色" v-model="relation.color" class="color-i">
+              <template slot="append">
+                <el-color-picker v-model="relation.color" class="color-p"></el-color-picker>
+              </template>
+            </el-input>
+            
+          </el-form-item>
           <el-form-item>
             <el-button type="warning" size="small" plain @click="relation ={gender: 'M'}">取消</el-button>
             <el-button type="success" size="small" plain @click="submitRelation">保存</el-button>
@@ -37,16 +45,21 @@
         <el-table :data="relations" border>
           <el-table-column prop="sequelence" width="60" label="序号">
           </el-table-column>
-          <el-table-column prop="name" label="姓名">
+          <el-table-column prop="name" label="姓名" width="160">
           </el-table-column>
-          <el-table-column label="性别" width="100">
+          <el-table-column label="性别" width="80">
               <template slot-scope="scope">
                 <span v-if="scope.row.gender==='M'">男</span>
                 <span v-if="scope.row.gender==='F'">女</span>
                 <span v-if="scope.row.gender==='MF'">未知</span>
               </template>
           </el-table-column>
-          <el-table-column prop="relation" label="关系" width="100">
+          <el-table-column prop="relation" label="关系" width="80">
+          </el-table-column>
+          <el-table-column label="颜色" width="60">
+            <template slot-scope="scope">
+              <div :style="{background: scope.row.color}" class="color-d"></div>
+            </template>
           </el-table-column>
           <el-table-column label="操作">
             <template slot-scope="scope">
@@ -71,6 +84,7 @@
           gender: 'M',
           relation: '',
           sequelence: 10,
+          color: '#cf9236',
         },
         rules: {
           name: [{
@@ -103,7 +117,17 @@
             type: 'integer',
             message: '必须输入整数',
             trigger: 'blur'
-          }]
+          }],
+          color: [{
+            required: true,
+            message: '输入颜色',
+            trigger: 'blur'
+            }, {
+              type: 'string',
+              pattern: /^#?([a-fA-F0-9]{6}|[a-fA-F0-9]{3})$/,
+              message: '请输入正确的hex颜色值',
+              trigger: 'blur'
+            }]
         }
       };
     },
@@ -123,7 +147,7 @@
               'content-type': 'application/json'
             },
           }).then(() => {
-            this.relation = {gender: 'M'};
+            this.relation = {gender: 'M', color: '#cf9236', sequelence: 10};
             this.getRelations();
           });
         })
@@ -168,4 +192,21 @@
   #RelationBtn {
     float: right;
   }
+  .el-color-picker__trigger {
+    padding:0;
+    border:none;
+  }
+
+  .el-input-group__append, .el-input-group__prepend {
+    padding:0;
+    background-color: #fff;
+    border:none;
+  }
+
+  .color-d {
+    height:24px;
+    cursor: pointer;
+    border-radius: 2px;
+  }
+
 </style>

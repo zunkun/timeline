@@ -9,6 +9,10 @@ const Image = sqlite.define('images', {
 		type: Sequelize.STRING,
 		unique: true
 	},
+	hash: {
+		type: Sequelize.STRING,
+		unique: true
+	},
 	link: Sequelize.STRING,
 	name: Sequelize.STRING,
 	base: Sequelize.STRING,
