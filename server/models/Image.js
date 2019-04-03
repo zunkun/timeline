@@ -19,7 +19,8 @@ const Image = sqlite.define('images', {
 	month: Sequelize.STRING,
 	day: Sequelize.STRING,
 	daystr: Sequelize.STRING,
-	ctime: Sequelize.DATE
+	ctime: Sequelize.DATE,
+	tags: Sequelize.STRING
 });
 
 Image.belongsTo(Directory);

@@ -1,7 +1,14 @@
 <template>
   <div id="home">
+    <div class="header">
+      <div id="img-h" v-if="checkedImages.length">
+        <span style="margin-right:10px;">分配人员</span>
+        <el-button type="success" size="small" plain v-for="relation in $store.state.relations" 
+                  :key="relation.id" @click="assign(relation)">{{relation.name}}</el-button>
+      </div>
+    </div>
     <div id="imagelist">
-      <el-row :gutter="10" v-for="(imageList, listIndex) of imageLists" :key="imageList.id">
+      <el-row :gutter="10" v-for="(imageList, listIndex) of imageLists" :key="imageList.id" class="image-group">
       <el-col :span="2">
         <div class="date-str">
           <div class="date-day">{{imageList.day}}</div>
@@ -11,8 +18,9 @@
       <el-col :span="22">
         <el-row>
           <el-col :span="4" v-for="(image, index) in imageList.Image" :key="image.id" class="image-outer">
-            <div class="image-inner" @click="viewImage(image, index, listIndex)">
-              <img :src="image.link" :alt="image.name" class="image-item">
+            <div class="image-inner" >
+              <img :src="image.link" :alt="image.name" class="image-item" @click="viewImage(image, index, listIndex)">
+              <input type="checkbox" class="check-item" v-model="image.checked" @click="checkImage(image, $event, index, listIndex)" />
             </div>
           </el-col>
         </el-row>
@@ -34,8 +42,10 @@
 </template>
 
 <script>
+  import ImageListView from '../components/ImageListView'
   export default {
     name: 'home',
+    components: {ImageListView},
     data() {
       return {
         showImage: false,
@@ -50,6 +60,8 @@
         startTime: null,
         page: 1,
         limit:5,
+        checked: false,
+        checkedImages: [],
       }
     },
     methods: {
@@ -121,6 +133,48 @@
             }, wait)
           }
         }
+      },
+      checkImage(image, event) {
+        if(event.target.checked) {
+          this.checkedImages.push(image);
+        } else {
+          let uncheckedIndex = this.checkedImages.findIndex(item => item.id ===image.id);
+          if(uncheckedIndex > -1) {
+            this.checkedImages.splice(uncheckedIndex, 1);
+          }
+        }
+      },
+      assign(relation) {
+        if(!this.checkedImages.length) {
+          return;
+        }
+
+        fetch('/tl/api/tags/', {
+          method: 'POST',
+          body: JSON.stringify({
+            images: this.checkedImages,
+            tag: relation.name,
+          }),
+          headers: {
+            'content-type': 'application/json'
+          },
+        }).then((res) => {
+          if(res.ok) {
+            this.notify('success', '分配照片', `照片分配到${relation.name}成功`);
+          } else {
+            this.notify('error', '分配照片', `照片分配到${relation.name}失败`);
+          }
+          return res;
+        }).catch(() => {
+          this.notify('error', '分配照片', `照片分配到${relation.name}失败`);            
+        });
+      },
+      notify(type, title, text) {
+        const h = this.$createElement;
+        this.$notify({
+          title,
+          message: h('i', { style: type === 'success' ? 'color: teal': 'color: red'}, text)
+        });        
       }
     },
     async created() {
@@ -139,16 +193,28 @@
     padding: 0;
   }
 
-  .el-header {
+  .header {
+    top: 0;
+    width: 100%;
+    height:60px;
+    overflow: hidden;
     position: fixed;
-    width:100%;
-    border-bottom: solid 1px #ccc;
-    opacity: 1;
     background: #fff;
+    border-bottom: solid 1px #e6e6e6;
   }
 
   #imagelist {
-    padding-top:60px;
+    margin-top:64px;
+  }
+
+  #imagelist .el-row {
+    position: unset !important;
+  }
+
+  .check-item {
+    width:20px;
+    height:20px;
+    cursor: pointer;
   }
 
   .date-day {
@@ -232,5 +298,10 @@
   .el-icon-arrow-right,
   .el-icon-arrow-left {
     font-size: 60px;
+  }
+
+  #img-h {
+    margin:14px;
+    vertical-align: center;
   }
 </style>

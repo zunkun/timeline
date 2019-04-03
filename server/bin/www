@@ -11,7 +11,7 @@ for (const key in env) {
 	}
 }
 
-const port = process.env.PORT || 3000;
+const port = process.env.PORT || 4000;
 
 const server = http.createServer(app.callback());
 server.listen(port);
@@ -44,5 +44,5 @@ function onListening () {
 	const bind = typeof addr === 'string'
 		? 'pipe ' + addr
 		: 'port ' + addr.port;
-	console.info('Listening on ' + bind);
+	console.log('Listening on ' + bind);
 }
