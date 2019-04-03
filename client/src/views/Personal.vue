@@ -26,7 +26,7 @@
     watch: {
       '$route'(to, from) {
         if(to.params.name !== from.params.name) {
-          this.getTags()
+          this.getTags();
         }
       }
     }

@@ -3,6 +3,9 @@
 const app = require('../app');
 const http = require('http');
 
+const scheduleWork = require('../services/scheduleWork');
+scheduleWork.start();
+
 const env = process.env.NODE_ENV === 'production' ? require('../config/production.json') : require('../config/development.json');
 
 for (const key in env) {

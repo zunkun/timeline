@@ -67,56 +67,9 @@ class ScanService {
 										return Promise.resolve(existImage);
 									}
 									console.log(`正在保存${image.name}`);
-									let exifData = await this.getExif(image.fullpath);
-
-									let timeStr = exifData.exif.DateTimeOriginal || exifData.exif.CreateDate;
-									let ctime;
-									if (timeStr) {
-										ctime = new Date(timeStr.split(' ')[0].replace(/\:/g, '-'));
-									} else {
-										ctime = new Date(image.ctime);
-									}
-									let year = ctime.getFullYear();
-									let month = ctime.getMonth() < 9 ? `0${ctime.getMonth() + 1}` : ctime.getMonth() + 1;
-									let day = ctime.getDate() < 10 ? `0${ctime.getDate()}` : ctime.getDate();
-									let daystr = `${year}-${month}-${day}`;
-
-									return this.getImageDateId(daystr, year, month, day)
-										.then(imagedateId => {
-											if (!imagedateId) {
-												return Promise.reject(Error(`获取日期信息失败 ${daystr}`));
-											}
-											return imagedateId;
-										})
-										.then((imagedateId) => {
-											return Image.create({
-												fullpath: image.fullpath,
-												hash,
-												link: image.fullpath.replace(/\\/g, '\/').slice(2),
-												name: image.name,
-												dir: image.dir,
-												base: image.base,
-												ext: image.ext,
-												directoryId,
-												year,
-												month,
-												day,
-												daystr,
-												ctime,
-												imagedateId
-											});
-										})
-										.then((imageData) => {
-											console.log(`存储 ${image.name} exif 信息`);
-											return Exif.create({
-												imageId: imageData.id,
-												imageInfo: exifData.image,
-												thumbnail: exifData.thumbnail,
-												gps: exifData.gps,
-												exif: exifData.exif,
-												interoperability: exifData.interoperability,
-												makernote: exifData.makernote
-											});
+									return this.getDayInfo(image.ctime, image.fullpath)
+										.then((dayInfo) => {
+											return this.saveImage(image, hash, directoryId, dayInfo);
 										});
 								});
 						});
@@ -124,6 +77,99 @@ class ScanService {
 				}
 				return Promise.all(promiseArray);
 			});
+	}
+
+	async saveImage (image, hash, directoryId, dayInfo) {
+		let { exifData, ctime, year, month, day, daystr, imagedateId } = dayInfo;
+		console.log('saveImage');
+		return Image.create({
+			fullpath: image.fullpath,
+			hash,
+			link: image.fullpath.replace(/\\/g, '\/').slice(2),
+			name: image.name,
+			dir: image.dir,
+			base: image.base,
+			ext: image.ext,
+			directoryId,
+			year,
+			month,
+			day,
+			daystr,
+			ctime,
+			imagedateId
+		}).then((imageData) => {
+			console.log(`存储 ${image.name} exif 信息`);
+			return this.saveExif(imageData.id, hash, exifData);
+		});
+	}
+
+	async getDayInfo (_ctime, fullpath) {
+		let exifData = await this.getExif(fullpath);
+
+		let timeStr = exifData.exif.DateTimeOriginal || exifData.exif.CreateDate;
+		let ctime;
+		if (timeStr) {
+			ctime = new Date(timeStr.split(' ')[0].replace(/\:/g, '-'));
+		} else {
+			ctime = new Date(_ctime);
+		}
+		let year = ctime.getFullYear();
+		let month = ctime.getMonth() < 9 ? `0${ctime.getMonth() + 1}` : ctime.getMonth() + 1;
+		let day = ctime.getDate() < 10 ? `0${ctime.getDate()}` : ctime.getDate();
+		let daystr = `${year}-${month}-${day}`;
+
+		return this.getImageDateId(daystr, year, month, day)
+			.then(imagedateId => {
+				if (!imagedateId) {
+					return Promise.reject(Error(`获取日期信息失败 ${daystr}`));
+				}
+				return { exifData, imagedateId, ctime, year, month, day, daystr };
+			});
+	}
+
+	async saveExif (imageId, hash, exifData) {
+		return Exif.insertOrUpdate({
+			imageId,
+			hash,
+			imageInfo: exifData.image,
+			thumbnail: exifData.thumbnail,
+			gps: exifData.gps,
+			exif: exifData.exif,
+			interoperability: exifData.interoperability,
+			makernote: exifData.makernote
+		}, {
+			where: { hash }
+		});
+	}
+
+	async saveExistPathImage (fullpath, hash) {
+		console.log({ fullpath, hash });
+		let stat = fs.statSync(fullpath);
+		let _isImage = isImage(fullpath);
+		if (!_isImage || !stat || stat.isDirectory()) {
+			return Promise.resolve();
+		} else {
+			console.log(stat.ctime, fullpath);
+			return this.getDayInfo(stat.ctime, fullpath)
+				.then(dayInfo => {
+					console.log({ dayInfo });
+					let { exifData, ctime, year, month, day, daystr, imagedateId } = dayInfo;
+					return Image.update({
+						hash,
+						ctime,
+						year,
+						month,
+						day,
+						daystr,
+						imagedateId
+					}, { where: { fullpath } })
+						.then(() => {
+							return Image.find({ fullpath }).then(imageData => {
+								return this.saveExif(imageData.id, hash, exifData);
+							});
+						});
+				});
+		}
 	}
 
 	async getImageDateId (daystr, year, month, day) {
@@ -135,9 +181,10 @@ class ScanService {
 				if (imageDate) {
 					return imageDate;
 				}
-				return ImageDate.upsert({ year, month, day, daystr }).then(() => {
-					return ImageDate.findOne({ where: { daystr } });
-				});
+				return ImageDate.upsert({ year, month, day, daystr })
+					.then(() => {
+						return ImageDate.findOne({ where: { daystr } });
+					});
 			})
 			.then(imageDate => {
 				this.imageDateMap.set(daystr, imageDate.id);

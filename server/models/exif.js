@@ -3,6 +3,10 @@ const Sequelize = require('sequelize');
 const Image = require('./Image');
 
 const Exif = sqlite.define('exifs', {
+	hash: {
+		type: Sequelize.STRING,
+		unique: true
+	},
 	imageInfo: Sequelize.JSON,
 	thumbnail: Sequelize.JSON,
 	exif: Sequelize.JSON,
