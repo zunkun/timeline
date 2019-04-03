@@ -10,12 +10,24 @@ router.get('/', async (ctx, next) => {
 	let page = Number(query.page) || 1;
 	let limit = Number(query.limit) || 10;
 	let offset = (page - 1) * limit;
-	console.log({ query, page, limit, offset });
+	let tags = query.tags || '';
+	const where = {};
+	if (tags) {
+		where.$or = [];
+		tags.split(',').forEach(tag => {
+			where.$or.push({
+				tags: {
+					$like: `%${tag}%`
+				}
+			});
+		});
+	}
+	console.log({ query, page, limit, offset, where });
 	try {
 		let imageLists = await ImageDate.findAll({
 			limit,
 			offset,
-			include: [{ model: Image, as: 'Image' }],
+			include: [{ model: Image, where, as: 'Image' }],
 			order: [['daystr', 'DESC']],
 			nested: true
 		});

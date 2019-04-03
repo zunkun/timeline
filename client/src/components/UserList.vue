@@ -145,7 +145,6 @@
         fetch('/tl/api/relations/')
         .then(res => res.json())
         .then(relations => {
-          console.log(relations)
           this.relations = relations ||[];
           this.$store.commit('setRelations', relations)
         });

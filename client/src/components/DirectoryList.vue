@@ -45,16 +45,6 @@
       }
     },
     methods: {
-      editDir(data) {
-        console.log({
-          data
-        })
-      },
-      delDir(data) {
-        console.log({
-          data
-        })
-      },
       listDirs() {
         fetch('/tl/api/disks/dirs')
         .then(res=> res.json())
@@ -68,8 +58,7 @@
         .then(disks => {
           this.disks = disks ||[]
           return this.disks;
-        }).catch(error => {
-          console.log(`获取磁盘列表失败`);
+        }).catch(() => {
           this.disks.length = 0;
         });
       },
@@ -110,12 +99,6 @@
           headers: {
             'content-type': 'application/json'
           },
-        })
-        .then(() => {
-          console.log('success')
-        })
-        .catch(error => {
-          console.log({error})
         });
 
         this.listDirs();
@@ -123,7 +106,6 @@
     },
     async created() {
       this.listDirs();
-      // this.listDisks();
     }
   }
 </script>

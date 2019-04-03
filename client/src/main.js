@@ -10,7 +10,6 @@ import global from '../global'
 Vue.use(ElementUI);
 Vue.prototype.GLOBAL = global;
 
-
 Vue.config.productionTip = false
 
 new Vue({
