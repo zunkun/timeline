@@ -1,6 +1,5 @@
 node_modules
 logs/*
-public/tl-web
 bin/daemon
 *.sqlite
 public/images/*.jpg
