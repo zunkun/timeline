@@ -1,9 +1,40 @@
 <template>
   <div id="relationlist">
     <el-row :gutter="20">
-      <el-col :span="8">
-        <el-form ref="relationform" :model="relation" :rules="rules" label-width="80px" label-position="right"
-          id="relationform">
+      <el-col :row="24">
+        <el-table :data="$store.state.relations" border>
+          <el-table-column prop="sequelence" width="60" label="排序">
+          </el-table-column>
+          <el-table-column prop="name" label="姓名" width="146">
+          </el-table-column>
+          <el-table-column label="性别" width="80">
+            <template slot-scope="scope">
+              <span v-if="scope.row.gender==='M'">男</span>
+              <span v-if="scope.row.gender==='F'">女</span>
+              <span v-if="scope.row.gender==='MF'">未知</span>
+            </template>
+          </el-table-column>
+          <el-table-column prop="relation" label="关系" width="80">
+          </el-table-column>
+          <el-table-column label="颜色" width="80">
+            <template slot-scope="scope">
+              <div :style="{background: scope.row.color}" class="color-d" @click="editRelation(scope.row, scope.$index)"></div>
+            </template>
+          </el-table-column>
+          <el-table-column label="操作">
+            <template slot-scope="scope">
+              <el-button size="mini" plain type="primary" @click="editRelation(scope, scope.row, scope.$index)">详情</el-button>
+              <el-button size="mini" plain type="success" @click="faces(scope.row, scope.$index)" v-if="scope.row.avatars">识别
+              </el-button>
+              <el-button size="mini" plain type="danger" @click="delRelation(scope.row)">删除</el-button>
+            </template>
+          </el-table-column>
+        </el-table>
+      </el-col>
+    </el-row>
+    <el-row class="r-edit">
+      <el-col :row="24">
+        <el-form ref="relationform" :model="relation" :rules="rules" label-width="80px" label-position="right" id="relationform">
           <el-form-item label="姓名" prop="name">
             <el-input v-model="relation.name"></el-input>
           </el-form-item>
@@ -32,42 +63,13 @@
               <template slot="append">
                 <el-color-picker v-model="relation.color" class="color-p"></el-color-picker>
               </template>
-            </el-input>            
+            </el-input>
           </el-form-item>
           <el-form-item label="照片" v-if="relation.id">
-            <!-- <div class="avatar-z">
-              <div class="avatar-l" v-if="relation.avatar">
-              </div>
-              <div class="avatar-r">
-              </div>
-            </div> -->
-            <!-- <el-upload
-              class="avatar-uploader"
-              action="/tl/api/relations/avatar"
-              :show-file-list="false"
-              :disabled="!relation.id"
-              accept=".jpg"
-              :on-success="updoadSuccess"
-              :data="avatarData"
-              :before-upload="beforeUpload">
-              <img v-if="imageUrl" :src="imageUrl" class="avatar">
-              <i v-else class="el-icon-plus avatar-uploader-icon"></i>
-            </el-upload> -->
-
-
-            <el-upload
-              action="/tl/api/relations/avatars"
-              list-type="picture-card"
-              :disabled="!relation.id"
-              accept=".jpg"
-              ref="upload"
-              :auto-upload="false"
-              :limit="limit"
-              :data="avatarData"
-              :file-list="fileList"
-              :before-upload="beforeUpload"
-              :on-preview="handlePictureCardPreview"
-              :on-remove="handleRemove">
+            <el-upload action="/tl/api/relations/avatars" list-type="picture-card" :disabled="!relation.id"
+              accept=".jpg" ref="upload" :limit="limit" :data="avatarData" :file-list="fileList"
+              :before-upload="beforeUpload" :on-preview="preview" :on-remove="removeAvatar"
+              :on-success="uploadSuccess">
               <i class="el-icon-plus"></i>
             </el-upload>
             <el-dialog :visible.sync="dialogVisible">
@@ -79,35 +81,6 @@
             <el-button type="success" size="small" plain @click="submitRelation">保存</el-button>
           </el-form-item>
         </el-form>
-      </el-col>
-      <el-col :span="16">
-        <el-table :data="$store.state.relations" border>
-          <el-table-column prop="sequelence" width="60" label="排序">
-          </el-table-column>
-          <el-table-column prop="name" label="姓名" width="146">
-          </el-table-column>
-          <el-table-column label="性别" width="80">
-              <template slot-scope="scope">
-                <span v-if="scope.row.gender==='M'">男</span>
-                <span v-if="scope.row.gender==='F'">女</span>
-                <span v-if="scope.row.gender==='MF'">未知</span>
-              </template>
-          </el-table-column>
-          <el-table-column prop="relation" label="关系" width="80">
-          </el-table-column>
-          <el-table-column label="颜色" width="80">
-            <template slot-scope="scope">
-              <div :style="{background: scope.row.color}" class="color-d" @click="editRelation(scope.row)"></div>
-            </template>
-          </el-table-column>
-          <el-table-column label="操作">
-            <template slot-scope="scope">
-              <el-button size="mini" plain type="primary" @click="editRelation(scope.row)">详情</el-button>
-              <el-button size="mini" plain type="success" @click="faces(scope.row)" v-if="scope.row.avatars">识别</el-button>
-              <el-button size="mini" plain type="danger" @click="delRelation(scope.row)">删除</el-button>
-            </template>
-          </el-table-column>
-        </el-table>
       </el-col>
     </el-row>
   </div>
@@ -126,6 +99,7 @@
           sequelence: 10,
           color: '#cf9236',
         },
+        relationIndex: 0,
         rules: {
           name: [{
               required: true,
@@ -162,38 +136,30 @@
             required: true,
             message: '输入颜色',
             trigger: 'blur'
-            }, {
-              type: 'string',
-              pattern: /^#?([a-fA-F0-9]{6}|[a-fA-F0-9]{3})$/,
-              message: '请输入正确的hex颜色值',
-              trigger: 'blur'
-            }]
+          }, {
+            type: 'string',
+            pattern: /^#?([a-fA-F0-9]{6}|[a-fA-F0-9]{3})$/,
+            message: '请输入正确的hex颜色值',
+            trigger: 'blur'
+          }]
         },
         imageUrl: '',
         avatarData: {},
         dialogImageUrl: '',
-        limit: 10,
+        limit: 20,
         fileList: [],
-        dialogVisible: false,
-        timestamp: Date.now(),
+        dialogVisible: false
       };
     },
     methods: {
       submitRelation() {
-        if(this.relation.id) {
-          if(!this.relation.timestamp) {
-            this.timestamp = Date.now();
-          }
-          this.$refs.upload.submit();
-        }
-
         let that = this;
         this.$refs.relationform.validate(valid => {
-          if(!valid) return;
-          let method = that.relation.id ? 'PUT': 'POST';
+          if (!valid) return;
+          let method = that.relation.id ? 'PUT' : 'POST';
           let baseUrl = '/tl/api/relations/';
 
-          let url = that.relation.id ? `${baseUrl}${that.relation.id}`: baseUrl;
+          let url = that.relation.id ? `${baseUrl}${that.relation.id}` : baseUrl;
           fetch(url, {
             method,
             body: JSON.stringify(that.relation),
@@ -201,36 +167,32 @@
               'content-type': 'application/json'
             },
           }).then(() => {
-            // this.relation = {gender: 'M', color: '#cf9236', sequelence: 10};
             this.getRelations();
           });
         })
       },
-      editRelation(relation) {
+      editRelation(relation, index) {
         this.relation = relation;
-        this.timestamp = relation.timestamp;
+        this.relationIndex = index || 0;
         this.setFileList();
       },
       delRelation(relation) {
-          fetch(`/tl/api/relations/${relation.id}`, {
-            method: 'DELETE',
-            headers: {
-              'content-type': 'application/json'
-            },
-          }).then(() => {
-            this.getRelations();
-          });
-      },
-      getRelations() {
-        fetch('/tl/api/relations/')
-        .then(res => res.json())
-        .then(relations => {
-          this.relations = relations ||[];
-          this.$store.commit('setRelations', relations)
+        fetch(`/tl/api/relations/${relation.id}`, {
+          method: 'DELETE',
+          headers: {
+            'content-type': 'application/json'
+          },
+        }).then(() => {
+          this.getRelations();
         });
       },
-      updoadSuccess(res, file) {
-        // this.relation.avatar = res.avatar;
+      getRelations() {
+        return fetch('/tl/api/relations/')
+          .then(res => res.json())
+          .then(relations => {
+            this.relations = relations || [];
+            this.$store.commit('setRelations', relations)
+          });
       },
       beforeUpload(file) {
         const isJPG = file.type === 'image/jpeg';
@@ -243,51 +205,62 @@
           this.$message.error('上传头像图片大小不能超过 10MB!');
         }
         this.avatarData.relation = this.relation.id;
-        this.avatarData.timestamp = this.timestamp;
         return isJPG && isLt2M;
       },
-      faces(relation) {
+      uploadSuccess() {
+        this.getRelations().then(() => {
+          this.relation = this.$store.state.relations[this.relationIndex || 0]
+          this.editRelation(this.$store.state.relations[this.relationIndex || 0], this.relationIndex || 0)
+        });
+      },
+      faces(relation, index) {
         this.relation = relation;
+        this.relationIndex = index || 0;
         fetch('/tl/api/faces/', {
           method: 'POST',
           body: JSON.stringify(relation),
           headers: {
             'content-type': 'application/json'
           },
-        }).then(() => {
-          console.log('res')
-          // this.relation = {gender: 'M', color: '#cf9236', sequelence: 10};
-          // this.getRelations();
         });
       },
 
-      handleRemove(file, fileList) {
-        console.log(file, fileList);
+      removeAvatar(file) {
+        if(!file.url) return;
+        fetch('/tl/api/relations/avatars', {
+          method: 'DELETE',
+          body: JSON.stringify({avatar: file.url.slice(file.url.indexOf('images')-1), id: this.relation.id}),
+          headers: {
+            'content-type': 'application/json'
+          },
+        });
       },
-      handlePictureCardPreview(file) {
+      preview(file) {
         this.dialogImageUrl = file.url;
         this.dialogVisible = true;
       },
       setFileList() {
         this.fileList = [];
         let avatars = this.relation.avatars || '';
-        if(!avatars) {
+        if (!avatars) {
           this.fileList = [];
           return;
         }
         avatars.split('|').map(url => {
+          if(!url) {
+            return;
+          }
           this.fileList.push({
             url: `/tl${url}`,
-            });
-        }); 
-        console.log(this.fileList)       
+          });
+        });
       }
     },
 
     created() {
-      if(this.$store.state.relations.length) {
+      if (this.$store.state.relations.length) {
         this.relation = this.$store.state.relations[0];
-        this.timestamp = this.relation.timestamp;
+        this.relationIndex = 0;
         this.setFileList()
       }
     }
@@ -306,33 +279,37 @@
   #relationBtn {
     float: right;
   }
+
   .el-color-picker__trigger {
-    padding:0;
-    border:none;
+    padding: 0;
+    border: none;
   }
 
-  .el-input-group__append, .el-input-group__prepend {
-    padding:0;
+  .el-input-group__append,
+  .el-input-group__prepend {
+    padding: 0;
     background-color: #fff;
-    border:none;
+    border: none;
   }
 
   .color-d {
-    height:24px;
+    height: 24px;
     cursor: pointer;
     border-radius: 2px;
   }
 
-    .avatar-uploader .el-upload {
+  .avatar-uploader .el-upload {
     border: 1px dashed #d9d9d9;
     border-radius: 6px;
     cursor: pointer;
     position: relative;
     overflow: hidden;
   }
+
   .avatar-uploader .el-upload:hover {
     border-color: #409EFF;
   }
+
   .avatar-uploader-icon {
     font-size: 28px;
     color: #8c939d;
@@ -341,6 +318,7 @@
     line-height: 178px;
     text-align: center;
   }
+
   .avatar {
     width: 178px;
     height: 178px;
@@ -350,13 +328,16 @@
   }
 
   .avatar-l {
-    float:left;
-    width:50%;
+    float: left;
+    width: 50%;
   }
 
   .avatar-r {
-    float:right;
-    width:50%;
+    float: right;
+    width: 50%;
   }
 
+  .r-edit {
+    margin-top:20px;
+  }
 </style>

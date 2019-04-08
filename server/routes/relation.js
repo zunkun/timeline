@@ -3,8 +3,6 @@ const router = new Router();
 const multer = require('koa-multer');
 const Relations = require('../models/Relations');
 
-const avatarSet = new Set();
-
 const storage = multer.diskStorage({
 	// 文件保存路径
 	destination: (req, file, cb) => {
@@ -18,19 +16,6 @@ const storage = multer.diskStorage({
 });
 // 加载配置
 const upload = multer({ storage });
-
-function delay (timestamp) {
-	return new Promise(function (resolve, reject) {
-		console.log('wait ...');
-		let timer = setInterval(function () {
-			if (!avatarSet.has(timestamp)) {
-				clearInterval(timer);
-				resolve(true);
-			}
-			console.log(timestamp, avatarSet.has(timestamp), 'wait...');
-		}, 500);
-	});
-}
 
 router.prefix('/tl/api/relations');
 
@@ -53,6 +38,55 @@ router.post('/', async (ctx, next) => {
 	await next();
 });
 
+router.post('/avatars', upload.single('file'), async (ctx, next) => {
+	const data = ctx.req.body;
+	const origin = ctx.req.file;
+	const avatar = `/images/${origin.filename}`;
+
+	Relations.findOne({
+		where: {
+			id: data.relation
+		}
+	}).then(async (relation) => {
+		if (!relation) {
+			return Promise.resolve();
+		}
+
+		if (!relation.avatars) {
+			relation.avatars = '';
+		}
+		if (relation.avatars.indexOf(avatar) > -1) {
+			return Promise.resolve();
+		}
+		return Relations.update({
+			avatars: `${relation.avatars}|${avatar}`
+		}, {
+			where: {
+				id: data.relation
+			}
+		});
+	});
+	ctx.body = {};
+});
+
+router.del('/avatars', async (ctx, next) => {
+	const { avatar, id } = ctx.request.body;
+
+	Relations.findOne({ where: { id } }).then(relation => {
+		if (!relation) return Promise.resolve();
+		let avatars = (relation.avatars || '').split('|') || [];
+		let index = avatars.indexOf(`${avatar}`);
+		if (index > -1) {
+			avatars.splice(index, 1);
+			return Relations.update({ avatars: avatars.join('|') }, { where: { id } });
+		}
+		return Promise.resolve();
+	});
+
+	ctx.status = 200;
+	await next();
+});
+
 router.put('/:id', async (ctx, next) => {
 	const relation = ctx.request.body;
 	if (!relation.name || !relation.sequelence) {
@@ -67,66 +101,6 @@ router.put('/:id', async (ctx, next) => {
 router.del('/:id', async (ctx, next) => {
 	Relations.destroy({ where: { id: ctx.params.id } });
 	ctx.status = 200;
-	await next();
-});
-
-router.post('/avatars', upload.single('file'), async (ctx, next) => {
-	const data = ctx.req.body;
-	const origin = ctx.req.file;
-	const avatar = `/images/${origin.filename}`;
-
-	if (avatarSet.has(data.timestamp)) {
-		console.log('等待...');
-		await delay(data.timestamp);
-		console.log('等待结束');
-	}
-	console.log(22222);
-
-	avatarSet.add(data.timestamp);
-
-	Relations.findOne({
-		where: {
-			id: data.relation
-		}
-	}).then(async (relation) => {
-		if (!relation) {
-			return Promise.resolve();
-		}
-		console.log(relation.timestamp, data.timestamp, relation.timestamp !== data.timestamp);
-		if (relation.timestamp !== data.timestamp) {
-			return Relations.update({
-				timestamp: data.timestamp,
-				avatars: avatar
-			}, {
-				where: {
-					id: data.relation
-				}
-			});
-		}
-
-		if (!relation.avatars) {
-			relation.avatars = '';
-		}
-
-		console.log(relation.avatars, avatar, relation.avatars.indexOf(avatar));
-
-		if (relation.avatars.indexOf(avatar) > -1) {
-			return Promise.resolve();
-		}
-		return Relations.update({
-			timestamp: data.timestamp,
-			avatars: `${relation.avatars}|${avatar}`
-		}, {
-			where: {
-				id: data.relation
-			}
-		});
-	}).then(() => {
-		console.log('finish');
-		avatarSet.delete(data.timestamp);
-		return Promise.resolve();
-	});
-	ctx.body = {};
 	await next();
 });
 
