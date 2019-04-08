@@ -27,4 +27,4 @@ nginx: 详情查看 server/docs/nginx.conf
 $ cd timeline/server && npm install && node bin/www
 
 ```
-访问: `http://localhost:4000/tl-web`
+访问: `http://localhost:4000/timeline`
