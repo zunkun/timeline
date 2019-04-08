@@ -13,6 +13,13 @@ module.exports = {
       '/tl/img': {
         target: 'http://127.0.0.1:6789/',
         pathRewrite: {'^/tl/img' : ''}
+      },
+      '/tl/images': {
+        target: 'http://[::1]:4000/',
+        secure: false,
+        ws: true,
+        changeOrigin: true,
+        pathRewrite: {'^/tl/images' : '/images'}
       }
     }
   }

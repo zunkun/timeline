@@ -105,7 +105,7 @@ class ScanService {
 
 	async getDayInfo (_ctime, fullpath) {
 		let exifData = await this.getExif(fullpath);
-
+		console.log({ exifData });
 		let timeStr = exifData.exif.DateTimeOriginal || exifData.exif.CreateDate;
 		let ctime;
 		if (timeStr) {
@@ -113,6 +113,7 @@ class ScanService {
 		} else {
 			ctime = new Date(_ctime);
 		}
+		console.log({ _ctime, fullpath });
 		let year = ctime.getFullYear();
 		let month = ctime.getMonth() < 9 ? `0${ctime.getMonth() + 1}` : ctime.getMonth() + 1;
 		let day = ctime.getDate() < 10 ? `0${ctime.getDate()}` : ctime.getDate();
@@ -213,9 +214,11 @@ class ScanService {
 
 	async getExif (fullpath) {
 		return new Promise((resolve, reject) => {
-			return ExifImage(fullpath, (err, exifData) => {
+			ExifImage(fullpath, (err, exifData) => {
 				if (err) {
-					reject(err);
+					console.log({ err });
+					// reject(err);
+					resolve({ exif: {} });
 				}
 				resolve(exifData);
 			});
@@ -227,7 +230,8 @@ class ScanService {
 		try {
 			if (node.isLeaf) {
 				let fileInfo = path.parse(node.id);
-				let images = [{ fullpath: node.id, dir: fileInfo.dir, base: fileInfo.base, name: fileInfo.name, ext: fileInfo.ext }];
+				let stat = fs.statSync(node.id);
+				let images = [{ fullpath: node.id, dir: fileInfo.dir, base: fileInfo.base, name: fileInfo.name, ext: fileInfo.ext, ctime: stat.ctime }];
 				return this.record(fileInfo.dir, images);
 			}
 			return this.scan(node.id);

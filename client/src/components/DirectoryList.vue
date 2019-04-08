@@ -4,7 +4,11 @@
       <el-col :span="12">
         <el-row>
           <span>目录列表</span>
-          <el-button size="mini" type="success" plain style="float:right; margin-right:20px;" @click="addNodes">新增目录</el-button>
+          <div class="m-r">
+            <el-button size="mini" type="primary" plain @click="addNodes">人员</el-button>
+            <el-button size="mini" type="warning" plain @click="addNodes">场景</el-button>
+            <el-button size="mini" type="success" plain @click="addNodes">新增目录</el-button>
+          </div>
         </el-row>
         <el-tree
           ref="folderlist"
@@ -122,5 +126,10 @@
 
   .disk-start {
     margin: 0 0 4px;
+  }
+
+  .m-r {
+    float:right;
+    margin-right: 10px;
   }
 </style>

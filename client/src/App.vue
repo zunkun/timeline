@@ -12,7 +12,7 @@
             <el-submenu index="2">
               <template slot="title" >
                 <i class="el-icon-tl-family"></i>
-                <span slot="title">家人</span>
+                <span slot="title">人员</span>
               </template>
               <el-menu-item-group>
                 <el-menu-item
@@ -28,6 +28,9 @@
                   :style="{color: relation.color}"
                 >
                   {{relation.name}}
+                </el-menu-item>
+                <el-menu-item index="noface" :route="{'name': 'personal', 'params': {'name': '无法识别'}}">
+                  无法识别
                 </el-menu-item>
               </el-menu-item-group>
             </el-submenu>

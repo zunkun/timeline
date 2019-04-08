@@ -6,7 +6,9 @@ const Relations = sqlite.define('relations', {
 	gender: Sequelize.STRING,
 	relation: Sequelize.STRING,
 	sequelence: Sequelize.INTEGER,
-	color: Sequelize.STRING
+	color: Sequelize.STRING,
+	timestamp: Sequelize.STRING,
+	avatars: Sequelize.TEXT
 });
 
 Relations.sync();

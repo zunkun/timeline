@@ -1,6 +1,6 @@
 const Sequelize = require('sequelize');
-const path = require('path')
-const fs = require('fs')
+const path = require('path');
+const fs = require('fs');
 const Op = Sequelize.Op;
 const operatorsAliases = {
 	$eq: Op.eq,
@@ -41,15 +41,16 @@ const operatorsAliases = {
 
 let fileDir = path.join(process.env.LOCALAPPDATA, './timeline');
 
-try{
-  fs.accessSync(fileDir,fs.F_OK);
-}catch(e){
-  fs.mkdirSync(fileDir)
+try {
+	fs.accessSync(fileDir, fs.F_OK);
+} catch (e) {
+	fs.mkdirSync(fileDir);
 }
 
+const storage = path.join(fileDir, 'timeline.sqlite');
 const sqlite = new Sequelize({
-  dialect: 'sqlite',
-  storage: path.join(fileDir, 'timeline.sqlite')
+	dialect: 'sqlite',
+	storage
 });
 
 module.exports = sqlite;

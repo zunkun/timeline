@@ -1,7 +1,11 @@
 var fs = require('fs');
 var crypto = require('crypto');
+const { faceDetectionNet, faceDetectionOptions, canvas } = require('./face');
 
 const util = {
+	faceDetectionNet,
+	faceDetectionOptions,
+	canvas,
 	getHash (filepath) {
 		return new Promise((resolve, reject) => {
 			if (!filepath || !fs.existsSync(filepath)) {

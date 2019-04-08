@@ -43,10 +43,10 @@ class ScheduleWork {
 
 		return Schedule.findOne({ where: { year, month, day } })
 			.then(schedule => {
-				console.log({ schedule });
 				if (schedule && schedule.status) {
 					scheduledDaySet.add(fullday);
 					console.log('今日已经扫描');
+					return Promise.resolve();
 				}
 
 				return Image.findAll({})
@@ -55,6 +55,7 @@ class ScheduleWork {
 
 						for (let image of images) {
 							let promise;
+							console.log(`扫描文件 ${image.fullpath}`);
 							if (!image.fullpath || !fs.existsSync(image.fullpath)) {
 								console.log(`文件${image.fullpath}不存在`);
 
@@ -89,4 +90,6 @@ class ScheduleWork {
 	}
 }
 
-module.exports = new ScheduleWork();
+const scheduleWork = new ScheduleWork();
+
+module.export = scheduleWork.start();

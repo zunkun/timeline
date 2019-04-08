@@ -1,26 +1,26 @@
 const Service = require('node-windows').Service;
 const path = require('path');
 
-// Create a new service object
 const svc = new Service({
-	name: 'ZKOA',
-	description: 'ZKOA SERVER',
+	name: 'timeline',
+	description: 'timeline',
 	script: path.join(__dirname, './bin/www'),
-	nodeOptions: [
-		'--harmony',
-		'--max_old_space_size=4096'
-	],
 	env: [{
 		name: 'NODE_ENV',
-		value: 'prod'
+		value: 'production'
+	}, {
+		PORT: 5800
 	}]
 });
 
-// Listen for the "install" event, which indicates the
-// process is available as a service.
 svc.on('install', function () {
-	console.log('ZKOA SERVER INSTALLED.');
+	console.log('時光程序启动');
 	svc.start();
 });
+
+// svc.on('uninstall', function () {
+// 	console.log('Uninstall complete.');
+// 	console.log('The service exists: ', svc.exists);
+// });
 
 svc.install();

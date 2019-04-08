@@ -2,6 +2,7 @@ const Router = require('koa-router');
 const router = new Router();
 const Image = require('../models/Image');
 const ImageDate = require('../models/ImageDate');
+const Scan = require('../models/Scan');
 
 router.prefix('/tl/api/images');
 
@@ -12,6 +13,29 @@ router.get('/', async (ctx, next) => {
 	let offset = (page - 1) * limit;
 	let tags = query.tags || '';
 	const where = {};
+	if (query.tags === '无法识别') {
+		let scans = await Scan.findAll({ tag: '核验未识别' });
+		let hashes = [];
+		for (let scan of scans) {
+			hashes.push(scan.hash);
+		}
+		const where = {
+			hash: {
+				$in: hashes
+			}
+		};
+
+		let imageLists = await ImageDate.findAll({
+			limit,
+			offset,
+			include: [{ model: Image, where, as: 'Image' }],
+			order: [['daystr', 'DESC']],
+			nested: true
+		});
+		ctx.body = imageLists;
+		return;
+	}
+
 	if (tags) {
 		where.$or = [];
 		tags.split(',').forEach(tag => {

@@ -1,30 +1,29 @@
 <template>
   <div id="settings">
-    <el-tabs v-model="activeName" @tab-click="handleClick">
-      <el-tab-pane label="目录管理" name="disk">
+    <el-tabs v-model="showTab">
+      <el-tab-pane label="照片目录" name="disk">
         <DirectoryList />
       </el-tab-pane>
-      <el-tab-pane label="用户管理" name="userlist">
-        <UserList />
+      <el-tab-pane label="家人管理" name="relations">
+        <Relationlist />
       </el-tab-pane>
-      <el-tab-pane label="主题管理" name="theme">主题管理</el-tab-pane>
+      <el-tab-pane label="标签设置" name="imagetags">
+        <ImageTags />
+      </el-tab-pane>
       <el-tab-pane label="任务设置" name="tasks">任务设置</el-tab-pane>
     </el-tabs>
   </div>
 </template>
 <script>
   import DirectoryList from '../components/DirectoryList.vue';
-  import UserList from '../components/UserList.vue';
+  import Relationlist from '../components/Relationlist.vue';
+  import ImageTags from '../components/ImageTags.vue';
   export default {
-    components: {DirectoryList, UserList},
+    components: {DirectoryList, Relationlist, ImageTags},
     data() {
       return {
-        activeName: 'userlist'
+        showTab: 'relations'
       };
-    },
-    methods: {
-      handleClick() {
-      }
     }
   };
 </script>
