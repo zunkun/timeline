@@ -5,7 +5,7 @@ require('@tensorflow/tfjs-node');
 var canvas = require('canvas');
 // require('@tensorflow/tfjs-node');
 
-const faceDetectionNet = faceapi.nets.tinyFaceDetector;
+const faceDetectionNet = faceapi.nets.ssdMobilenetv1;
 var Canvas = canvas.Canvas;
 var Image = canvas.Image;
 var ImageData = canvas.ImageData;

@@ -46,7 +46,6 @@ class FaceService {
 		await faceDetectionNet.loadFromDisk('./public/models');
 		await faceapi.nets.faceLandmark68Net.loadFromDisk('./public/models');
 		await faceapi.nets.faceRecognitionNet.loadFromDisk('./public/models');
-
 		if (!relation.avatars) {
 			return;
 		}
@@ -65,7 +64,6 @@ class FaceService {
 				const refImage = await canvas.loadImage(url);
 				console.log({ refImage });
 				const refResult = await faceapi.detectSingleFace(refImage).withFaceLandmarks().withFaceDescriptor();
-
 				if (refResult && refResult.descriptor) {
 					refDescriptors.push(refResult.descriptor);
 				}
@@ -210,7 +208,7 @@ class FaceService {
 			console.log(`检测 ${image.fullpath}   ${url}`);
 			const queryImage = await canvas.loadImage(url);
 
-			const results = await faceapi.detectAllFaces(queryImage, new faceapi.TinyFaceDetectorOptions()).withFaceLandmarks().withFaceDescriptors();
+			const results = await faceapi.detectAllFaces(queryImage).withFaceLandmarks().withFaceDescriptors();
 
 			if (!results.length) {
 				console.log(`图片 ${image.fullpath} 没有人脸信息`);

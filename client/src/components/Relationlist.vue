@@ -23,7 +23,7 @@
           </el-table-column>
           <el-table-column label="操作">
             <template slot-scope="scope">
-              <el-button size="mini" plain type="primary" @click="editRelation(scope, scope.row, scope.$index)">详情</el-button>
+              <el-button size="mini" plain type="primary" @click="editRelation(scope.row, scope.$index)">详情</el-button>
               <el-button size="mini" plain type="success" @click="faces(scope.row, scope.$index)" v-if="scope.row.avatars">识别
               </el-button>
               <el-button size="mini" plain type="danger" @click="delRelation(scope.row)">删除</el-button>
@@ -157,7 +157,7 @@
         this.$refs.relationform.validate(valid => {
           if (!valid) return;
           let method = that.relation.id ? 'PUT' : 'POST';
-          let baseUrl = '/tl/api/relations/';
+          let baseUrl = '/tl-web/api/relations/';
 
           let url = that.relation.id ? `${baseUrl}${that.relation.id}` : baseUrl;
           fetch(url, {
@@ -177,7 +177,7 @@
         this.setFileList();
       },
       delRelation(relation) {
-        fetch(`/tl/api/relations/${relation.id}`, {
+        fetch(`/tl-web/api/relations/${relation.id}`, {
           method: 'DELETE',
           headers: {
             'content-type': 'application/json'
@@ -187,7 +187,7 @@
         });
       },
       getRelations() {
-        return fetch('/tl/api/relations/')
+        return fetch('/tl-web/api/relations/')
           .then(res => res.json())
           .then(relations => {
             this.relations = relations || [];
@@ -216,7 +216,7 @@
       faces(relation, index) {
         this.relation = relation;
         this.relationIndex = index || 0;
-        fetch('/tl/api/faces/', {
+        fetch('/tl-web/api/faces/', {
           method: 'POST',
           body: JSON.stringify(relation),
           headers: {
@@ -227,7 +227,7 @@
 
       removeAvatar(file) {
         if(!file.url) return;
-        fetch('/tl/api/relations/avatars', {
+        fetch('/tl-web/api/relations/avatars', {
           method: 'DELETE',
           body: JSON.stringify({avatar: file.url.slice(file.url.indexOf('images')-1), id: this.relation.id}),
           headers: {
@@ -251,7 +251,7 @@
             return;
           }
           this.fileList.push({
-            url: `/tl${url}`,
+            url: `${url}`,
           });
         });
       }

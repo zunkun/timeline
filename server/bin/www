@@ -2,10 +2,7 @@
 
 const app = require('../app');
 const http = require('http');
-var cluster = require('cluster');
-var cpuNums = require('os').cpus().length;
 
-// require('../services/scheduleWork');
 const env = process.env.NODE_ENV === 'production' ? require('../config/production.json') : require('../config/development.json');
 
 for (const key in env) {
@@ -21,12 +18,6 @@ server.listen(port);
 server.on('error', onError);
 server.on('listening', onListening);
 console.log(`Worker ${process.pid} started`);
-// if (cluster.isMaster) {
-// 	cluster.fork();
-// 	// for (var i = 0; i < cpuNums; i++) {
-// 	// }
-// } else {
-// }
 
 function onError (error) {
 	if (error.syscall !== 'listen') {

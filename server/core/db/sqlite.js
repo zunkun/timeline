@@ -50,7 +50,8 @@ try {
 const storage = path.join(fileDir, 'timeline.sqlite');
 const sqlite = new Sequelize({
 	dialect: 'sqlite',
-	storage
+	storage,
+	operatorsAliases
 });
 
 module.exports = sqlite;

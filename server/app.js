@@ -25,7 +25,6 @@ app.on('error', function (err) {
 function initRouters (pathRoute) {
 	let routersPath = path.join(__dirname, 'routes');
 	let files = fs.readdirSync(routersPath);
-	console.log({ files });
 
 	files.forEach(file => {
 		let stat = fs.lstatSync(path.join(routersPath, file));

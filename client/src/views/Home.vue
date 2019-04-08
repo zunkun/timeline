@@ -31,7 +31,7 @@
           return this.notify('danger', '分配照片', `请给${relation.name}选择需要分配的照片`)
         }
 
-        fetch('/tl/api/tags/', {
+        fetch('/tl-web/api/tags/', {
           method: 'POST',
           body: JSON.stringify({
             images: this.checkedImages,
@@ -57,7 +57,7 @@
           return this.notify('danger', '分配照片', `必须选择一张照片`)
         }
 
-        fetch('/tl/api/images/explore', {
+        fetch('/tl-web/api/images/explore', {
           method: 'POST',
           body: JSON.stringify({
             fullpath: this.checkedImages[0].fullpath,

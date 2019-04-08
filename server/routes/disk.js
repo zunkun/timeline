@@ -3,7 +3,7 @@ const router = new Router();
 const diskService = require('../services/diskService');
 const Directory = require('../models/Directory');
 
-router.prefix('/tl/api/disks');
+router.prefix('/tl-web/api/disks');
 router.get('/', async (ctx, next) => {
 	try {
 		let disklists = await diskService.listDisk();

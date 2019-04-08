@@ -5,7 +5,7 @@ import Home from './views/Home.vue'
 Vue.use(Router)
 
 export default new Router({
-  mode: 'history',
+  // mode: 'history',
   base: process.env.BASE_URL,
   routes: [
     {
@@ -17,11 +17,6 @@ export default new Router({
       path: '/personal/:name',
       name: 'personal',
       component: () => import('./views/Personal.vue')
-    },
-    {
-      path: '/timeline',
-      name: 'timeline',
-      component: Home
     },
     {
       path: '/settings',

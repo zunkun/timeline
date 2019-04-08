@@ -50,14 +50,14 @@
     },
     methods: {
       listDirs() {
-        fetch('/tl/api/disks/dirs')
+        fetch('/tl-web/api/disks/dirs')
         .then(res=> res.json())
         .then(directories => {
           this.directories = directories ||[]
         });
       },
       listDisks() {
-        return fetch('/tl/api/disks/')
+        return fetch('/tl-web/api/disks/')
         .then(res => res.json())
         .then(disks => {
           this.disks = disks ||[]
@@ -82,7 +82,7 @@
          return resolve(nodes)
         }
         
-        fetch(`/tl/api/disks/path?folderPath=${node.data.id}`)
+        fetch(`/tl-web/api/disks/path?folderPath=${node.data.id}`)
         .then(res => res.json())
         .then(folders => {
           resolve(folders)
@@ -97,7 +97,7 @@
         checkedNodes.forEach(check => {
           nodes.push({id: check.id, isLeaf: !!check.isLeaf, name: check.name})
         });
-        fetch('/tl/api/disks', {
+        fetch('/tl-web/api/disks', {
           method: 'POST',
           body: JSON.stringify(nodes),
           headers: {

@@ -65,7 +65,7 @@
         this.checkedImages = [];
       },
       loadImages() {
-        fetch(`/tl/api/images?page=${this.page++}&limit=${this.limit}&tags=${this.tags || ''}`)
+        fetch(`/tl-web/api/images?page=${this.page++}&limit=${this.limit}&tags=${this.tags || ''}`)
           .then(res => res.json())
           .then((imageLists = []) => {
             for (let imageList of imageLists) {
