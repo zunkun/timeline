@@ -6,7 +6,7 @@ const faceService = require('../services/faceService');
 let isRecognition = false;
 const faceMap = new Map();
 
-router.prefix('/tl-web/api/faces');
+router.prefix('/timeline/api/faces');
 router.post('/', async (ctx, next) => {
 	const { id } = ctx.request.body;
 	if (isRecognition || (faceMap.has(id) && (Date.now() - faceMap.get(id)) < 20 * 1000)) {

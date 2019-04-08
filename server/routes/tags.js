@@ -2,7 +2,7 @@ const Router = require('koa-router');
 const router = new Router();
 const Image = require('../models/Image');
 
-router.prefix('/tl-web/api/tags');
+router.prefix('/timeline/api/tags');
 
 router.post('/', async (ctx) => {
 	const { tag, images } = ctx.request.body;

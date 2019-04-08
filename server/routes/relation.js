@@ -17,7 +17,7 @@ const storage = multer.diskStorage({
 // 加载配置
 const upload = multer({ storage });
 
-router.prefix('/tl-web/api/relations');
+router.prefix('/timeline/api/relations');
 
 router.get('/', async (ctx, next) => {
 	return Relations.findAll({ order: [['sequelence', 'ASC']] })

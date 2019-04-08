@@ -4,7 +4,7 @@ const Image = require('../models/Image');
 const ImageDate = require('../models/ImageDate');
 const Scan = require('../models/Scan');
 
-router.prefix('/tl-web/api/images');
+router.prefix('/timeline/api/images');
 
 router.get('/', async (ctx, next) => {
 	let query = ctx.query;
