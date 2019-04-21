@@ -16,7 +16,25 @@ const tags = {
 	'交通运输': ['汽车', '自行车']
 };
 
+const todoTypes = [{ type: 'important', name: '重要事项' }, { type: 'common', name: '普通事项' }];
+
+const projectTypes = [
+	{ type: 'project', name: '项目' },
+	{ type: 'work', name: '工作' },
+	{ type: 'family', name: '家庭' },
+	{ type: 'life', name: '生活' },
+	{ type: 'skills', name: '技能' }
+];
+
+const progress = [
+	{ sequence: 0, type: 'todo', name: '计划做' },
+	{ sequence: 1, type: 'inprogress', name: '正在做' },
+	{ sequence: 2, type: 'done', name: '已完成' }
+];
 module.exports = {
 	tags,
-	imageBase: 'http://localhost:6789'
+	imageBase: 'http://localhost:6789',
+	todoTypes,
+	projectTypes,
+	progress
 };

@@ -21,6 +21,16 @@ const util = {
 				resolve(hash);
 			});
 		});
+	},
+	stringHash (string) {
+		try {
+			var md5sum = crypto.createHash('md5');
+			let hash = md5sum.update(string).digest('hex');
+			return hash;
+		} catch (error) {
+			console.log({ error });
+			return '';
+		}
 	}
 };
 
