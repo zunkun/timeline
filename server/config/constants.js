@@ -29,7 +29,8 @@ const projectTypes = [
 const progress = [
 	{ sequence: 0, type: 'todo', name: '计划做' },
 	{ sequence: 1, type: 'inprogress', name: '正在做' },
-	{ sequence: 2, type: 'done', name: '已完成' }
+	{ sequence: 2, type: 'done', name: '已完成' },
+	{ sequence: 3, type: 'archive', name: '归档' }
 ];
 module.exports = {
 	tags,

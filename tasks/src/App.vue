@@ -9,17 +9,17 @@
               <span slot="title">主页</span>
             </el-menu-item>
             <el-menu-item index="2" :route="{'name': 'projects'}">
-              <i class="el-icon-date"></i>
+              <i class="el-icon-tl-kanban"></i>
               <span slot="title">项目</span>
             </el-menu-item>
             <el-menu-item index="3" :route="{'name': 'todos'}">
               <i class="el-icon-tickets"></i>
               <span slot="title">事项</span>
             </el-menu-item>
-            <!-- <el-menu-item index="4" :route="{'name': 'calendar'}">
+            <el-menu-item index="4" :route="{'name': 'calendar'}">
               <i class="el-icon-date"></i>
               <span slot="title">日历</span>
-            </el-menu-item> -->
+            </el-menu-item>
           </el-menu>
         </el-aside>
         <el-container>

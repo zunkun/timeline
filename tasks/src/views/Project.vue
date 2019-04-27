@@ -386,6 +386,7 @@
 <style>
   #project {
     margin: 0px;
+    min-width: 100%;
     display: inline-block;
   }
 
@@ -469,6 +470,7 @@
     min-width: 280px;
     max-width: 280px;
     margin: 10px;
+    height: calc(100vh - 200px);
     display: inline-block;
   }
 
